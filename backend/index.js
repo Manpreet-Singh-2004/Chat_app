@@ -11,11 +11,11 @@ const server = createServer(app);
  */
 const io = new Server(server, {
   cors: {
-    origin: true, // ✅ allow all origins (DEV)
+    origin: true,
     methods: ["GET", "POST"],
     credentials: true,
   },
-  transports: ["websocket"], // 🔥 no polling → no upgrade drama
+  transports: ["websocket"],
 });
 
 io.on("connection", (socket) => {
