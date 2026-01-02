@@ -1,0 +1,27 @@
+// prisma/schema.prisma
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  engineType   = "client"      // Rust-free Prisma Client
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String    @id @default(uuid())
+  clerkId   String    @unique
+  username  String    @unique
+  createdAt DateTime  @default(now())
+  messages  Message[]
+}
+
+model Message {
+  id        String    @id @default(uuid())
+  content   String
+  senderId  String
+  sentAt    DateTime  @default(now())
+  sender    User      @relation(fields: [senderId], references: [id])
+}

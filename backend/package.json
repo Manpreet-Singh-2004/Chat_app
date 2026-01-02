@@ -4,17 +4,25 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "prisma:mig": "prisma migrate dev",
+    "prisma:gen": "prisma generate",
+    "prisma:studio": "prisma studio"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
+    "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
+    "@types/node": "^25.0.3",
     "cross-env": "^10.1.0",
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "prisma": "^7.2.0"
   }
 }
