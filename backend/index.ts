@@ -1,14 +1,16 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import 'dotenv/config'
+// import {clerkMiddleware} from "@clerk/express"
 
 const app = express();
+const PORT = 3000
 const server = createServer(app);
 
-/**
- * DO NOT overthink CORS for WebSockets in dev.
- * Let Socket.IO handle it.
- */
+// app.use(clerkMiddleware())
+
+
 const io = new Server(server, {
   cors: {
     origin: true,
@@ -35,6 +37,10 @@ app.get("/api/health", (req, res) => {
   res.json({ ok: true, message: "WebSocket backend alive" });
 });
 
-server.listen(3000, () => {
-  console.log("Backend running on http://localhost:3000");
+app.get("/", (req, res) =>{
+  res.json({ok: true, message: `Welcome to the home page, Port: ${PORT}`})
+})
+
+server.listen(PORT, () => {
+  console.log(`Backend running on http://localhost:${PORT}`);
 });
