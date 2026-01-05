@@ -57,4 +57,24 @@ build -> converts files from TS into JS  so they can run and used internally (in
 
 start -> sttarts the src/index.js file
 
-# Issue
+# Issue and resolve CLERK_WEBHOOK_SIGNING_SECRET 04/01/2025
+
+The error was simple yet it took me kinda some time to figure out, the webhook was not being verified by `verifyWebhook` because the railway was not importing the env variable `CLERK_WEBHOOK_SIGNING_SECRET`. so just like we did with the `DATABASE_URL`. I added that at runtime.
+Do note that i cannot test this feature in localhost, this is because for the user creation event it requires svix headers, so i had to install clerk CLI and then send it out.
+
+
+# Model for user sign-up/creation
+
+```json
+Frontend (Next.js)
+   ↓
+User signs up via Clerk UI
+   ↓
+Clerk creates user in Clerk system
+   ↓
+Clerk sends webhook → /webhooks/clerk
+   ↓
+Backend stores user in YOUR DB
+```
+
+The frontend should hit a proctected backend API, not the webhook
