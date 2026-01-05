@@ -56,3 +56,5 @@ prebuild -> generates prisma generate folder files that are in TS
 build -> converts files from TS into JS  so they can run and used internally (in a dist folder)
 
 start -> sttarts the src/index.js file
+
+# Issue
