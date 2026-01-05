@@ -16,7 +16,7 @@ const handleWebhook = async(req: Request, res: Response) =>{
         const eventType = evt.type
 
         console.log(`Received webhook with the ID: ${id} and the event type: ${eventType}`)
-        console.log(`Webhook payload: ${evt.data}`)
+        console.log(`Webhook payload: `, evt.data)
 
         switch (eventType){
             case "user.created":
