@@ -4,6 +4,12 @@ import type { WebhookEvent } from "@clerk/express";
 import {prisma} from "../../db/prisma.js"
 
 const handleWebhook = async(req: Request, res: Response) =>{
+
+    console.log("ENV CHECK:", {
+        CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SIGNING_SECRET,
+    });
+
+
     try{
         const evt = (await verifyWebhook(req)) as WebhookEvent;
         const {id} = evt.data
