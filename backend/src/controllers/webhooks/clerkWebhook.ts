@@ -4,12 +4,6 @@ import type { WebhookEvent } from "@clerk/express";
 import {prisma} from "../../db/prisma.js"
 
 const handleWebhook = async(req: Request, res: Response) =>{
-
-    console.log("ENV CHECK:", {
-        CLERK_WEBHOOK_SIGNING_SECRET: process.env.CLERK_WEBHOOK_SIGNING_SECRET,
-    });
-
-
     try{
         const evt = (await verifyWebhook(req)) as WebhookEvent;
         const {id} = evt.data
@@ -54,7 +48,7 @@ async function handleUserCreated(evt: WebhookEvent){
                 imageUrl: image_url
             }
         });
-        console.log(`User created: ${user}`)
+        console.log(`User created: `, JSON.stringify(user))
     } catch(error){
         console.log(`Error while creating user: ${error}`);
         throw error;
