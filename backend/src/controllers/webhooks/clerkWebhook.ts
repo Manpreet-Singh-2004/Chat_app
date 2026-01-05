@@ -28,7 +28,7 @@ const handleWebhook = async(req: Request, res: Response) =>{
         return res.status(200).json({recieved: true})
     } catch(error){
         console.error(`Error verifying the webhook: ${error}`)
-        return res.status(400).json({error: `Error verifying the webhook`})
+        return res.status(400).json({error: `Error verifying the webhook: ${error}`})
     }
 }
 
