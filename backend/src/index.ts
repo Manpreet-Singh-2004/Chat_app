@@ -45,7 +45,7 @@ app.get("/", (req, res) =>{
 })
 
 app.post(
-  "api/webhooks/clerk",
+  "/webhooks/clerk",
   express.raw({type: "application/json"}),
   handleWebhook
 )
