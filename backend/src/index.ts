@@ -2,6 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import 'dotenv/config'
+import handleWebhook from "./controllers/webhooks/clerkWebhook.js";
 // import {clerkMiddleware} from "@clerk/express"
 
 
@@ -42,6 +43,12 @@ app.get("/api/health", (req, res) => {
 app.get("/", (req, res) =>{
   res.json({ok: true, message: `Welcome to the home page, Port: ${PORT}`})
 })
+
+app.post(
+  "api/webhooks/clerk",
+  express.raw({type: "application/json"}),
+  handleWebhook
+)
 
 server.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);

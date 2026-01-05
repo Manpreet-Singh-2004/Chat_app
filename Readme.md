@@ -43,3 +43,16 @@ This will basically make a TS compiled folder with the name `dist/` and then we 
 import {PrismaClient}  from '../generated/prisma/client.js'; // in the end .js file
 ```
 for development we can just use the regular **npm run dev** command to run the server
+
+### Deployment
+Don't forget during deployment, you might encounter the error saying something like cannot find files for client.js, the trick here is to have the prebuild commands, in your package.json add these lines
+```json
+    "prebuild": "prisma generate",
+```
+what this is that this command runs before the build command, so if we go in flow
+
+prebuild -> generates prisma generate folder files that are in TS
+
+build -> converts files from TS into JS  so they can run and used internally (in a dist folder)
+
+start -> sttarts the src/index.js file
