@@ -35,32 +35,17 @@ const handleWebhook = async(req: Request, res: Response) =>{
 async function handleUserCreated(evt: WebhookEvent){
     if(evt.type !== "user.created") return;
 
-    const {id: clerkId, first_name, last_name, username: clerkUsername, email_addresses, image_url} = evt.data;
-
-    const email =
-        email_addresses?.find(
-            e => e.id === evt.data.primary_email_address_id
-        )?.email_address;
-
-    if (!email) {
-        throw new Error("No email in Clerk webhook");
-    }
-
-    const baseUsername = clerkUsername ?? generateBaseUsername(email, first_name || "")
-    
-    const uniqueUsername = await generateUniqueUsername(baseUsername)
+    const {id, first_name, last_name, username, email_addresses, image_url} = evt.data;
 
     try{
-        const user = await prisma.user.upsert({
-            where: {clerkId},
-            update: {},
-            create:{
-                clerkId,
-                email,
-                username: uniqueUsername,
-                firstName: first_name ?? "",
-                lastName: last_name ?? "",
-                imageUrl: image_url ?? "",
+        const user = await prisma.user.create({
+            data: {
+                clerkId: id,
+                username: username || "",
+                firstName: first_name || "",
+                lastName: last_name || "",
+                email: email_addresses?.[0]?.email_address || "",
+                imageUrl: image_url
             }
         });
         console.log(`User created: `, JSON.stringify(user))
@@ -68,51 +53,22 @@ async function handleUserCreated(evt: WebhookEvent){
         console.log(`Error while creating user: ${error}`);
         throw error;
     }
-
 }
 
 async function handleUserUpdate(evt: WebhookEvent){
     if(evt.type !== "user.updated") return;
 
-    const {id: clerkId, first_name, last_name, username: clerkUsername, email_addresses, image_url, primary_email_address_id} = evt.data
-
-    const email =
-        email_addresses?.find(
-            e => e.id === primary_email_address_id
-        )?.email_address;
-
-    if (!email) {
-        throw new Error("No email in user.updated webhook");
-    }
-
-    const existingUser = await prisma.user.findUnique({
-        where: { clerkId },
-        select: { username: true },
-    });
-
-    if (!existingUser) {
-        throw new Error(`User with clerkId ${clerkId} not found`);
-    }
-
-    let finalUsername = existingUser.username;
-
-    if (!finalUsername) {
-        const baseUsername =
-        clerkUsername ??
-        generateBaseUsername(email, first_name ?? "");
-
-        finalUsername = await generateUniqueUsername(baseUsername);
-    }
+    const {id, first_name, last_name, username, email_addresses, image_url} = evt.data
 
     try{
         const user = await prisma.user.update({
-            where: {clerkId},
+            where: {clerkId: id},
             data: {
-                email,
-                username: finalUsername,
-                firstName: first_name ?? "",
-                lastName: last_name ?? "",
-                imageUrl: image_url ?? "",
+                username: username || "",
+                firstName: first_name || "",
+                lastName: last_name || "",
+                email: email_addresses?.[0]?.email_address || "",
+                imageUrl: image_url
             }
         });
         console.log(`User Updated Successfully: `, JSON.stringify(user))
@@ -131,32 +87,12 @@ async function handleUserDeleted(evt: WebhookEvent){
         const user = await prisma.user.delete({
             where: {clerkId: id}
         })
-        console.log(`User deletion successfull: ${user}`)
+        console.log(`User deletion successfull: `, JSON.stringify(user))
     } catch(error){
         console.log(`Error while deleating the User: ${error}`);
         throw error
     }
 
-}
-
-function generateBaseUsername(email: string, firstName?: string){
-    if(firstName) return firstName.toLowerCase();
-    return email.split("@")[0].toLowerCase()
-}
-
-async function generateUniqueUsername(base: string){
-    let username = base;
-    let suffix = 0;
-
-    while(true){
-        const existing = await prisma.user.findUnique({
-            where: {username},
-            select: {id: true},
-        });
-        if(!existing) return username
-        suffix++;
-        username = `${base}${suffix}`;
-    }
 }
 
 export default handleWebhook;
