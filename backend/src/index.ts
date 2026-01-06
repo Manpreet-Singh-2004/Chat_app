@@ -2,16 +2,15 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import 'dotenv/config'
-import handleWebhook from "./controllers/webhooks/clerkWebhook.js";
 // import {clerkMiddleware} from "@clerk/express"
-
+import router from "./routes/routes.js";
 
 
 const app = express();
 const PORT = 3000
 const server = createServer(app);
 
-// app.use(clerkMiddleware())
+app.use(router)
 
 
 const io = new Server(server, {
@@ -44,11 +43,7 @@ app.get("/", (req, res) =>{
   res.json({ok: true, message: `Welcome to the home page, Port: ${PORT}`})
 })
 
-app.post(
-  "/webhooks/clerk",
-  express.raw({type: "application/json"}),
-  handleWebhook
-)
+
 
 server.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);

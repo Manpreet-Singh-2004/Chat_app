@@ -25,7 +25,7 @@ const handleWebhook = async(req: Request, res: Response) =>{
             default:
                 console.log(`Unhandled event type: ${eventType}`)
         }
-        return res.status(200).json({recieved: true})
+        return res.status(200).json({received: true})
     } catch(error){
         console.error(`Error verifying the webhook: ${error}`)
         return res.status(400).json({error: `Error verifying the webhook: ${error}`})
