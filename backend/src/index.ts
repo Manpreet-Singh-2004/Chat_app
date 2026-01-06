@@ -10,7 +10,9 @@ const app = express();
 const PORT = 3000
 const server = createServer(app);
 
-app.use(router)
+app.use("/api",router)
+
+app.use(express.json())
 
 
 const io = new Server(server, {
@@ -35,14 +37,9 @@ io.on("connection", (socket) => {
   });
 });
 
-app.get("/api/health", (req, res) => {
-  res.json({ ok: true, message: "WebSocket backend alive" });
-});
-
 app.get("/", (req, res) =>{
   res.json({ok: true, message: `Welcome to the home page, Port: ${PORT}`})
 })
-
 
 
 server.listen(PORT, () => {

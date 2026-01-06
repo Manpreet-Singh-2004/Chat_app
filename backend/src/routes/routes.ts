@@ -9,4 +9,11 @@ router.post(
     handleWebhook
 )
 
+router.get(
+    "/health",
+    (req, res) =>{
+        res.json({ok: true, message: "Alive and working fine"})
+    }
+)
+
 export default router;
