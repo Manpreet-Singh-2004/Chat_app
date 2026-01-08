@@ -84,3 +84,5 @@ The frontend should hit a proctected backend API, not the webhook
 # Small Issue and fix 07-01-2025
 
 Got error because i was using express middleware and then defining the routes, another error i got was of `CLERK_PUBLISHABLE_KEY` before in my env variables i had `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` but for express you dont use the keyword `NEXT_PUBLIC` so removed that and it worked
+
+Remaining Issue? I just got to know that there is a way using which we can add a username field in clerk so it has to take a unique username, this will be help full in because then i wont have to make a seperate page. I will implement it, that would also mean that i can get rid of baseUsername and UniqueUsername functions in clerkWebhooks in backend

@@ -5,6 +5,8 @@ import { socket } from "../lib/socket";
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAtom } from "jotai";
 import { loadingAtom } from "./store/loadingAtom";
+import UserProfile from "@/components/Profile/UserProfile";
+import { User } from "lucide-react";
 
 export default function Home() {
 
@@ -17,7 +19,7 @@ export default function Home() {
       <div className="justify-center">
         <Skeleton className="h-[50px] w-[400px] rounded-full" />    
       </div>
-      
+      <UserProfile />
       </div>
   );
 }
