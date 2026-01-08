@@ -2,7 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import 'dotenv/config'
-// import {clerkMiddleware} from "@clerk/express"
+import {clerkMiddleware} from "@clerk/express"
 import router from "./routes/routes.js";
 
 
@@ -12,6 +12,7 @@ const server = createServer(app);
 
 app.use("/api",router)
 
+app.use(clerkMiddleware())
 app.use(express.json())
 
 

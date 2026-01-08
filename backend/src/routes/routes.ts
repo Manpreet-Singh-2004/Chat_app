@@ -1,5 +1,6 @@
 import express from "express";
 import handleWebhook from "../controllers/webhooks/clerkWebhook.js";
+import userProfile from "../controllers/user/UserData.js";
 
 const router = express.Router();
 
@@ -15,5 +16,7 @@ router.get(
         res.json({ok: true, message: "Alive and working fine"})
     }
 )
+
+router.get("/user/profile", userProfile)
 
 export default router;
