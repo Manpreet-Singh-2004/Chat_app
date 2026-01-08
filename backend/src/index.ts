@@ -10,10 +10,12 @@ const app = express();
 const PORT = 3000
 const server = createServer(app);
 
-app.use("/api",router)
-
 app.use(clerkMiddleware())
 app.use(express.json())
+
+
+app.use("/api",router)
+
 
 
 const io = new Server(server, {

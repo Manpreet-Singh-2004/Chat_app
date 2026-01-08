@@ -81,3 +81,6 @@ Backend stores user in YOUR DB
 
 The frontend should hit a proctected backend API, not the webhook
 
+# Small Issue and fix 07-01-2025
+
+Got error because i was using express middleware and then defining the routes, another error i got was of `CLERK_PUBLISHABLE_KEY` before in my env variables i had `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` but for express you dont use the keyword `NEXT_PUBLIC` so removed that and it worked

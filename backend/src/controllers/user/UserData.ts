@@ -3,6 +3,7 @@ import type {Request, Response} from "express";
 import {prisma} from "../../db/prisma.js"
 
 export default async function userProfile (req: Request, res: Response) {
+
     const {isAuthenticated, userId} = getAuth(req);
 
     if(!isAuthenticated){
