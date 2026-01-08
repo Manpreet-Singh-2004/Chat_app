@@ -10,7 +10,7 @@ const PORT = 3000
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3001",
+    origin: process.env.FRONTEND_URL,
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
