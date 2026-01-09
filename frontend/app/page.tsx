@@ -16,9 +16,6 @@ export default function Home() {
     <div>
       <h1>Welcome home</h1>
 
-      <div className="justify-center">
-        <Skeleton className="h-[50px] w-[400px] rounded-full" />    
-      </div>
       <UserProfile />
       </div>
   );
