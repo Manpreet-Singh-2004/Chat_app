@@ -1,6 +1,10 @@
 import express from "express";
 import handleWebhook from "../controllers/webhooks/clerkWebhook.js";
 import userProfile from "../controllers/user/UserData.js";
+import getUsers from "../controllers/user/GetUsers.js";
+import {getChatId} from "../controllers/chat/Chat.js";
+import authMiddleware from '../middleware/auth.js'
+import { getAuth } from '@clerk/express';
 
 const router = express.Router();
 
@@ -18,5 +22,7 @@ router.get(
 )
 
 router.get("/user/profile", userProfile)
+router.get("/users", authMiddleware.getAuthenticatedUser ,getUsers)
+router.post("/user/getChatId", authMiddleware.getAuthenticatedUser ,getChatId)
 
 export default router;
