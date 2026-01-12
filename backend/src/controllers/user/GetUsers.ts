@@ -13,6 +13,7 @@ export default async function getUsers (req: Request, res: Response){
         if(!users || users.length === 0){
             return res.status(404).json({message: "Could not find any users"});
         }
+        console.log("Users fetched:", users);
         return res.status(200).json({ success: true , users});
     } catch(error){
         console.log("Error fetching users:", error);

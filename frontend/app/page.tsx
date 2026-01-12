@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { socket } from "../lib/socket";
-import { Skeleton } from "@/components/ui/skeleton"
 import { useAtom } from "jotai";
 import { loadingAtom } from "./store/loadingAtom";
 import UserProfile from "@/components/Profile/UserProfile";
-import { User } from "lucide-react";
+import ChatMain from "@/components/SideBarChat/ChatMain";
 
 export default function Home() {
 
@@ -17,6 +14,9 @@ export default function Home() {
       <h1>Welcome home</h1>
 
       <UserProfile />
+      <div className="flex items-center justify-center h-screen">
+        <ChatMain />
+      </div>
       </div>
   );
 }
