@@ -86,3 +86,27 @@ The frontend should hit a proctected backend API, not the webhook
 Got error because i was using express middleware and then defining the routes, another error i got was of `CLERK_PUBLISHABLE_KEY` before in my env variables i had `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` but for express you dont use the keyword `NEXT_PUBLIC` so removed that and it worked
 
 Remaining Issue? I just got to know that there is a way using which we can add a username field in clerk so it has to take a unique username, this will be help full in because then i wont have to make a seperate page. I will implement it, that would also mean that i can get rid of baseUsername and UniqueUsername functions in clerkWebhooks in backend
+
+# Issue and Fixes during Jotai, users.controller store and type management 12-01-2026
+
+So the first issue i encountered was of type management, for this i simply created a types folder and added a user type in it, then i simply exported the file in other components and then i just extended the user with the `User` in the component.
+
+Then came Jotai state management, for this i made a declaration in user.atoms.ts, then i made the writable atoms in the same folder "store/users/" with the name user.controllers.ts. This is basically writable atoms, then using i used axios and useEffect to store the data in the user atoms, so now i dont have to useEffect again in the SideBarChat/ChatMain. I simply imported it, and using the api/Auth.ts i made a api call and then fetchUsers(api) in the useEffect.
+
+If you notice in the useEffect the dependency array is Empty, and that is because when i put the dependency there like this (It caused Loop)
+
+```tsx
+  useEffect(() => {
+    fetchUsers(api);
+  }, [fetchUser, api]);
+```
+
+It caused circular dependency which caused an infinite loop, so to avoid that i just kept it empty, so that it only loads up on the initial load. So that is why currently i am using this -:
+
+```tsx
+  useEffect(() => {
+    fetchUsers(api);
+  }, []);
+```
+
+Other types were also handled in the user controller, the `isAxiosError`, `instanceof Error` or if they are not in any of these, then simply "Something went wrong"
