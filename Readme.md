@@ -110,3 +110,50 @@ It caused circular dependency which caused an infinite loop, so to avoid that i 
 ```
 
 Other types were also handled in the user controller, the `isAxiosError`, `instanceof Error` or if they are not in any of these, then simply "Something went wrong"
+
+# Introducing States 12/01/2026
+I am implementing a new mechanism, now the user can only chat when the other user accepts the invite.
+Hence **A DM can exist in multiple states, Messages are allowed in only one state**
+
+Now the DM has this life cycle -:
+```bash
+NONE → INVITED → ACTIVE
+```
+User B accepts the invite, then chat exists, status becomes Active
+
+User B declines the invite, then Delete the chat entirely, set the Invited status to declined.
+
+For this app i am gonna stick with a softer policy, i will allow re invite, and declined will be rarely used
+
+*What is dmkey?*
+
+it guarantees that only 1 DM object exists per user pair, invitations dont duplicate and we can safely upsert.
+
+Every sendMessage endpoint must check for this state, chat.status === ACTIVE
+
+## State = Invited
+2 levels of DM lifecycles, `chat.status` and `chatUsers.status` per user, Invited means pending handshake.
+
+A DM exists because one user initiated it, other hasnt accepted it. `invitedByUserId` tells who invited the user.
+
+Chat users:
+
+Inviter → ACCEPTED | cannot invite again, cannot accept (already accepted)
+
+Invitee → PENDING | can accept, cannot re-invite
+
+## Status = Active
+Both users have accepted, the chat is fully usable. Both `chatUsers.status = "ACCEPTED"` and `chat.status = "ACTIVE"`. Any future invite attempt will return "DM already exists".
+
+## Status = Declined
+invitee said "no". Chat is frozen but not deleated. A new invite can resurrect it. Re-invite behaviour goes back to Invited, Roles reset:
+
+New inviter → ACCEPTED
+
+Other user → PENDING
+
+Backend | state | Inviter sees | 	Invitee sees
+NONE	| “Start chat” |	“Start chat”
+INVITED |	“Invite sent” (disabled)	| “Accept / Decline”
+ACTIVE	| Chat messages	| Chat messages
+DECLINED	| “Invite declined / Re-invite”	| “You declined”

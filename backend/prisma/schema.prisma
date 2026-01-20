@@ -32,11 +32,18 @@ model Chat{
   id String @id @default(uuid())
   createdAt DateTime @default(now())
   chatType ChatType @default(DM)
+  status ChatStatus @default(INVITED)
+
+  // For DM
+  dmKey String? @unique
+  invitedByUserId String?
 
   groupIcon String?
   groupName String?
+
   groupAdmin User? @relation("groupAdmin", fields: [groupAdminUserId], references: [id])
   groupAdminUserId String?
+
   messages Message[]
   chatUsers ChatUser[]
 }
@@ -44,6 +51,9 @@ model Chat{
 model ChatUser{
   id String @id @default(uuid())
   role ChatUserType @default(MEMBER)
+
+  status ChatUserStatus @default(PENDING)
+
   lastReadAt DateTime?
   joinedAt DateTime @default(now())
   leftAt DateTime?
@@ -83,4 +93,16 @@ enum ChatType{
 enum ChatUserType{
   ADMIN
   MEMBER
+}
+
+enum ChatStatus{
+  INVITED
+  ACTIVE
+  DECLINED
+}
+
+enum ChatUserStatus{
+  PENDING
+  ACCEPTED
+  DECLINED
 }
