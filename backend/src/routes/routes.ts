@@ -2,12 +2,13 @@ import express from "express";
 import handleWebhook from "../controllers/webhooks/clerkWebhook.js";
 import userProfile from "../controllers/user/UserData.js";
 import getUsers from "../controllers/user/GetUsers.js";
-import {getChatId} from "../controllers/chat/Chat.js";
+
 import authMiddleware from '../middleware/auth.js'
+
+import {getDMBetweenUsers} from "../controllers/chat/Chat.js";
 import {acceptDMInvite} from "../controllers/invite/AcceptDMInvite.js";
 import {declineDMInvite} from "../controllers/invite/DeclineDMInvite.js";
 import {inviteToDM} from "../controllers/invite/inviteController.js";
-import { getAuth } from '@clerk/express';
 
 const router = express.Router();
 
@@ -38,7 +39,7 @@ router.post("/chats/dm/:chatId/accept", authMiddleware.getAuthenticatedUser, acc
 router.post("/chats/dm/:chatId/decline", authMiddleware.getAuthenticatedUser, declineDMInvite)
 
 // Get Chat
-router.get("/chats/:chatId", authMiddleware.getAuthenticatedUser, getChatId)
+router.get("/chats/dm/:otherUserId", authMiddleware.getAuthenticatedUser, getDMBetweenUsers)
 
 // Lookup Chat by participants
 // router.post("/chats/dm/lookup", authMiddleware.getAuthenticatedUser ,getChatId)

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, use } from "react"
 import ChatHeader from "@/components/ChatItems/ChatHeader"
 import useAuthApi from "@/app/api/Auth";
 import InviteActions from "@/components/ChatItems/InviteActions";
@@ -14,8 +14,8 @@ interface ChatMeta{
     invitedByUserId?: string;
 }
 
-export default function ChatPage({params} : {params: {userId: string}}){
-    const otherUserId = params.userId;
+export default function ChatPage({params} : {params: Promise<{id: string}>}){
+    const {id: otherUserId} = use(params);
     const api = useAuthApi();
 
     const [chat, setChat] = useState<ChatMeta | null>(null)
@@ -24,7 +24,7 @@ export default function ChatPage({params} : {params: {userId: string}}){
     useEffect(() => {
         async function loadChat(){
             try{
-                const res = await api.get(`/chats/dm/${otherUserId}`)
+                const res = await api.get(`api/chats/dm/${otherUserId}`)
                 setChat(res.data)
             } catch(error){
                 setChat({status: "NONE"})
@@ -32,7 +32,9 @@ export default function ChatPage({params} : {params: {userId: string}}){
                 setLoading(false);
             }
         }
-        loadChat()
+        if(otherUserId){
+          loadChat()
+        }
     }, [otherUserId])
 
     if(loading) return <div className="p-4">Loading…</div>;

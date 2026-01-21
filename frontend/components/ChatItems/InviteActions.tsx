@@ -20,15 +20,15 @@ export default function InviteActions({
     const isInviter = chat.invitedByUserId === userId;
 
     async function invite(){
-        const res = await api.post("/chats/dm/invite", {otherUserId});
+        const res = await api.post("/api/chats/invite", {otherUserId});
         setChat(res.data);
     }
     async function accept(){
-        const res = await api.post(`/chats/dm/${chat.chatId}/accept`);
+        const res = await api.post(`/api/chats/dm/${chat.chatId}/accept`);
         setChat(res.data)
     }
     async function decline(){
-        const res = await api.post(`/chats/dm/${chat.chatId}/decline`);
+        const res = await api.post(`/api/chats/dm/${chat.chatId}/decline`);
         setChat(res.data);
     }
 

@@ -172,3 +172,27 @@ So my previous push was done in a rush and ofcourse it has a bunch of things tha
             })
         ]);
 ```
+
+## So what is happening now? (When is DM created?)
+We are CREATING A DM WHEN THE INVITE IS SENT, not when it is accepted, we are creating it before.
+
+User A sends Invite: calls inviteToDM -> Creates Chat in DB with status INVITED.
+
+User B loads page: calls getChatId (Lookup) -> Sees chat exists with status INVITED.
+
+User B clicks Accept: calls acceptDMInvite -> Updates Chat status to ACTIVE.
+
+Since we are gonna be sending a GET request for chat, i am gonna have to remove the `req.body` from it, and send the data back to the frontend and a few more changes. I was planning to keep a single file for both GET and POST and that has come to bite me in the end, so i am just gonna keep the Distinction i think. Also gonna rename the function from `getChatId` to `getDMBetweenUsers` because now i wont just return the Id, i will return the whole chat.
+
+Now that i have updated the code base, there is a new thing, since its now a GET, in the *frontend/app/chat/[id]/page.tsx*
+i have to use params, and since `params` are god damn promises we have to use `await`, and since i have to use await, the funciton has to be `async` in the function, butttttt we cannot do that becauseeee its a god damn client component, thankfull the most sane thing to do now is to use `use` from react.
+so i just did this
+```ts
+const {id: otherUserId} = use(params);
+```
+
+But i am having troubles with Axios now, Oh wait NVM it was because i am just stupid, basically i forgot to add a `/api`, before i was using it WRONG `api`, also i was sending the whole `...chat` in the backend `Chat.ts`, now i am sending -:
+```ts
+chatId: chat.id, status: chat.status, invitedByUserId: chat.invitedByUserId
+```
+The mismatch was that backend was sending object from prisma which uses the key `Id`, but the frontend `ChatPage` and `InviteActions` expected `chatId`
