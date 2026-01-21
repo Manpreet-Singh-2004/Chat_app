@@ -28,39 +28,13 @@ export async function getChatId (req: Request, res: Response) {
         });
 
         if(!chat){
-            const newChat = await prisma.chat.create({
-                data:{
-                    chatUsers: {
-                        create: [
-                            {
-                                user: {
-                                    connect:{
-                                        id: userId,
-                                    }
-                                }
-                            },
-                            {
-                                user: {
-                                    connect:{
-                                        id: otherUserId,
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                },
-                select:{
-                    id: true
-                },
-            });
-
-            return res.status(201).json({success: true, chat: newChat, message: "New chat created"});
+            return res.status(404).json({success: false, message: "No Chat was found. Please send an invite"});
         }
 
         return res.status(200).json({success: true, chat, message: "Chat found"});
 
     } catch(error){
-        console.log("Error fetching chat ID:", error);
-        return res.status(500).json({error: "Internal Server Error"})
+        console.log("Chat Controller | Error fetching chat ID:", error);
+        return res.status(500).json({error: "Internal Server Error | Chat Controller"})
     }
 }

@@ -32,6 +32,8 @@ export async function inviteToDM(req: Request, res: Response){
             },
         })
 
+        // Chat dose not exists - Create new invite
+
         if(!existingChat){
             const chat = await prisma.chat.create({
                 data:{
@@ -43,16 +45,17 @@ export async function inviteToDM(req: Request, res: Response){
                         create:[
                             {
                                 userId,
-                                status: "ACCEPTED",
+                                status: "ACCEPTED", // Inviter automatically accepts
                             },
                             {
                                 userId: otherUserId,
-                                status: "PENDING",
+                                status: "PENDING", // Invitee is pending because it is sent to them
                             },
                         ],
                     },
                 },
-                select:{
+                // Only send back the the id and the status
+                select:{ 
                     id: true,
                     status: true,
                 },
@@ -65,6 +68,7 @@ export async function inviteToDM(req: Request, res: Response){
                 message: "Invite Sent"
             })
         }
+        //  Chat already exists
 
         if(existingChat.status === "ACTIVE"){
             return res.status(200).json({
@@ -75,10 +79,11 @@ export async function inviteToDM(req: Request, res: Response){
             })
         }
 
-//  Invite
+//  when in Invite state
 
         if(existingChat.status === "INVITED"){
             
+            //  If invite sent by same inviter
             if(existingChat.invitedByUserId === userId){
                 return res.status(200).json({
                 success: true,

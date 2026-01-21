@@ -157,3 +157,18 @@ NONE	| “Start chat” |	“Start chat”
 INVITED |	“Invite sent” (disabled)	| “Accept / Decline”
 ACTIVE	| Chat messages	| Chat messages
 DECLINED	| “Invite declined / Re-invite”	| “You declined”
+
+# Issues 20/01/2026
+So my previous push was done in a rush and ofcourse it has a bunch of things that i had to look over, in the `DeclineDMInvite` there was a bug which was in the final update prisma function, i was updating in the **where** clause and was using **chatId**, which dosent makes sense, so it is now. I was also gone for a few days and was a bit confused as to what i was doing, so i have added some comments as to explain what i was doing. Expect more pushes and code reviews in a few days. 
+```ts
+        await prisma.$transaction([
+            prisma.chatUser.update({
+                where: {id: chatUser.id},
+                data: {status: "DECLINED"},
+            }),
+            prisma.chat.update({
+                where: {id: chatId},
+                data:{ status: "DECLINED"}
+            })
+        ]);
+```
