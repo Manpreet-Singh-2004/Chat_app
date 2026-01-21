@@ -1,10 +1,12 @@
 import express from "express";
 import handleWebhook from "../controllers/webhooks/clerkWebhook.js";
-import userProfile from "../controllers/user/UserData.js";
-import getUsers from "../controllers/user/GetUsers.js";
+
 
 import authMiddleware from '../middleware/auth.js'
 
+import userProfile from "../controllers/user/UserData.js";
+import getUsers from "../controllers/user/GetUsers.js";
+import getUserById from "../controllers/user/GetUserById.js";
 import {getDMBetweenUsers} from "../controllers/chat/Chat.js";
 import {acceptDMInvite} from "../controllers/invite/AcceptDMInvite.js";
 import {declineDMInvite} from "../controllers/invite/DeclineDMInvite.js";
@@ -25,10 +27,12 @@ router.get(
     }
 )
 
-// Get a single profile
+// Get a single profile of the user that is logged in
 router.get("/user/profile", userProfile)
 // Get all users
 router.get("/users", authMiddleware.getAuthenticatedUser ,getUsers)
+// Get user by ID
+router.get("/user/:id", authMiddleware.getAuthenticatedUser ,getUserById)
 
 // -- Chats and DMs
 // Invite

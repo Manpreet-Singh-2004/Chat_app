@@ -196,3 +196,26 @@ But i am having troubles with Axios now, Oh wait NVM it was because i am just st
 chatId: chat.id, status: chat.status, invitedByUserId: chat.invitedByUserId
 ```
 The mismatch was that backend was sending object from prisma which uses the key `Id`, but the frontend `ChatPage` and `InviteActions` expected `chatId`
+
+While fixing type errors, i got an error for `status = NONE`, in my DB there is no chat status as **NONE** they are as follows
+
+```ts
+enum ChatStatus{
+  INVITED
+  ACTIVE
+  DECLINED
+}
+```
+
+So just for the frontend when it encounters any error i have added an enum as NONE in types/chat.ts
+
+Also make sure that in the `controller/Chat.ts` we are sending `id: chat.id` because that is what matters. just got the bug because frontend expects 
+```bash
+interface Chat { id: string; status: string }
+```
+but because i am using `setChat(res.data)` in *chat/[id]/page.tsx* it is a direct copy paste. It takes whatever keys the backend sent and dumps them into your state.
+so when i was using `chatId: chatId` the state becomes 
+```bash
+{ chatId: "123", status: "ACTIVE" }
+```
+And my code tried to read chat.id, but this object doesnt have id, it has chatId, hence it became undefined.

@@ -2,11 +2,12 @@
 
 import useAuthApi from "@/app/api/Auth"
 import { useAuth } from "@clerk/nextjs"
+import { Chat } from "@/app/types/chats"
 
 interface Props{
-    chat: any;
+    chat: Chat;
     otherUserId: string;
-    setChat: (chat: any) => void;
+    setChat: (chat: Chat) => void;
 }
 
 export default function InviteActions({
@@ -24,11 +25,11 @@ export default function InviteActions({
         setChat(res.data);
     }
     async function accept(){
-        const res = await api.post(`/api/chats/dm/${chat.chatId}/accept`);
+        const res = await api.post(`/api/chats/dm/${chat.id}/accept`);
         setChat(res.data)
     }
     async function decline(){
-        const res = await api.post(`/api/chats/dm/${chat.chatId}/decline`);
+        const res = await api.post(`/api/chats/dm/${chat.id}/decline`);
         setChat(res.data);
     }
 

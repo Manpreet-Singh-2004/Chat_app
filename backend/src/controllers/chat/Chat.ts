@@ -30,7 +30,7 @@ export async function getDMBetweenUsers (req: Request, res: Response) {
         }
 
         console.log("Chat found between users:", chat);
-        return res.status(200).json({success: true, chatId: chat.id, status: chat.status, invitedByUserId: chat.invitedByUserId, message: "Chat found"});
+        return res.status(200).json({success: true, id: chat.id, status: chat.status, invitedByUserId: chat.invitedByUserId, message: "Chat found"});
 
     } catch(error){
         console.log("Chat Controller | Error fetching chat ID:", error);

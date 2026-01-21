@@ -5,6 +5,7 @@ import { UserRound } from "lucide-react";
 import useAuthApi from "@/app/api/Auth";
 import { useEffect, useState } from "react";
 import type { User } from "@/app/types/user";
+import ChatHeaderSkeleton from "./ChatHeaderSkeleton";
 
 interface ChatHeaderProps {
   otherUserId: string;
@@ -18,17 +19,18 @@ export default function ChatHeader({ otherUserId }: ChatHeaderProps) {
     if (!otherUserId) return;
 
     async function loadUser() {
-      const res = await api.get(`/users/${otherUserId}`);
-      setUser(res.data);
+      const res = await api.get(`/api/user/${otherUserId}`);
+      setUser(res.data.user);
     }
 
     loadUser();
   }, [otherUserId]);
 
   if (!user) {
+    console.log("Loading user for ChatHeader:", user, otherUserId);
     return (
       <div className="h-16 flex items-center px-4 border-b">
-        Loading…
+        < ChatHeaderSkeleton />
       </div>
     );
   }
