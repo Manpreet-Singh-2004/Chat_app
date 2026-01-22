@@ -10,13 +10,6 @@ const app = express();
 
 const PORT = 3000
 
-// Global Tester Start
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] Incoming Request: ${req.method} ${req.originalUrl}`);
-  next();
-});
-// Global tester end
-
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,

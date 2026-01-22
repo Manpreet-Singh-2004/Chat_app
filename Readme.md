@@ -270,3 +270,11 @@ Okay i have another idea, i will add the clerk webhook before any other middlewa
 Okay so now i am sure that the issue is not middleware, because i tried it and it didnt worked, also because then the sample event would have also failed. This brings me back to the initial hypothesis, that the frontent is not hitting the correct api. for users to be created it needs to hit `/api/webhooks/clerk` but in all the logs it kept its hitting other user and user/profile apis. It didnt made sense to me, I thought that it is hitting that endpoint because clerk automatically hits that endpoint on our behalf. But now i think the issue is the same one, I have to make sure that the frontend is hitting this exact api, because that is when the user is gonna be created. The issue now is how is that gonna happen?
 
 I am gonna deal with that later, because i have work in the morning and its already 3 AM in the morning. Man, i have 3 days of work, 8 hrs a day, thats more or less wake up, get food, go to work, come back home sleep. and repeat. But i have to keep looking at this issue otherwise i might forget the details about it.
+
+# Issue resolved 22-1-2026
+first of all i enabled the endpoint, in the configure > webhooks > endpoints > enable endpoint.
+
+looks like it got disabled god damn it. After enabling it, i wiped the DB with the command `npx prisma migrate reset` and then tested it again and it worked. That got me wondering on the user deletion stuff. check next section
+
+# Heads up for future
+when deleting user, it might be deleted from clerk, but it **might** not get deleted from DB because that user id exists as foreign keys for other chats and messages, If that is the case i have to delete the chats and messages first and then delete the user.

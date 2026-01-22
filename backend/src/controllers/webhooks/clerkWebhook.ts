@@ -42,30 +42,11 @@ async function handleUserCreated(evt: WebhookEvent){
     if(evt.type !== "user.created") return;
 
     const {id: clerkId, first_name, last_name, username: clerkUsername, email_addresses, image_url} = evt.data;
-
     
-
-    // --- MODIFIED CODE START ---
-    // Try to find the email normally
-    let email = email_addresses?.find(
+    const email =
+        email_addresses?.find(
             e => e.id === evt.data.primary_email_address_id
         )?.email_address;
-
-    // FALLBACK: If email is missing (like in the Clerk Test), use a fake one so the code doesn't crash.
-    if (!email) {
-        console.warn("⚠️ No email found in payload. Using fallback email for testing.");
-        email = "test_fallback@example.com"; 
-    }
-    // --- MODIFIED CODE END ---
-
-    
-
-
-    // Temp off
-    // const email =
-    //     email_addresses?.find(
-    //         e => e.id === evt.data.primary_email_address_id
-    //     )?.email_address;
 
     if (!email) {
         throw new Error("No email in Clerk webhook");
@@ -135,7 +116,7 @@ async function handleUserUpdate(evt: WebhookEvent){
             where: {clerkId},
             data: {
                 email,
-                username: finalUsername,
+                username: clerkUsername, // Testing this to see
                 firstName: first_name ?? "",
                 lastName: last_name ?? "",
                 imageUrl: image_url ?? "",
