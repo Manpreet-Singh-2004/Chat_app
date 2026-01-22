@@ -222,3 +222,45 @@ And my code tried to read chat.id, but this object doesnt have id, it has chatId
 
 # Added Message sending capabilities
 Now we can send the messages, the endpoint is now at `/api/chats/:chatId/messages`. Now i will make a viewable, what messages bellong to who.
+
+# Clerk and NeonDB Issue 22-01-2026
+God Damn it, i am having issues with clerk again, so whats happening? The user is being created in clerk but not in Neon DB.
+
+I sent sample data from clerk backend, DO NOTE THAT CLERK DOSENT SEND EMAILS IN SAMPLE DATA SO I HAD TO ADD A CLAUSE TO TEMP. ADD EMAIL IN CLERK WEBHOOK. Check *backend/src/controllers/webhooks/clerkWebhooks.ts*
+
+```ts
+    // --- MODIFIED CODE START ---
+    // Try to find the email normally
+    let email = email_addresses?.find(
+            e => e.id === evt.data.primary_email_address_id
+        )?.email_address;
+
+    // FALLBACK: If email is missing (like in the Clerk Test), use a fake one so the code doesn't crash.
+    if (!email) {
+        console.warn("⚠️ No email found in payload. Using fallback email for testing.");
+        email = "test_fallback@example.com"; 
+    }
+    // --- MODIFIED CODE END ---
+
+
+    // Temp off
+    // const email =
+    //     email_addresses?.find(
+    //         e => e.id === evt.data.primary_email_address_id
+    //     )?.email_address;
+```
+
+This will temp add emails, and the user is being created in both clerk and Neon DB when i send it from clerk sample.
+
+The issue is that when i try from the frontend, the user appears on clerk, but not on Neon DB.
+
+What does it mean? The frontend is talking to clerk okay, clerk cannot pass the data to Neon DB, but due to previous sample i sent i also know that clerk can talk to DB. so it boils down to the express middleware which is causing the raw data to be converted to something else.
+
+I have checked the network flows in the frontend and can tell the base URLs for backend are the same, which is good, the user can sign in (if it exists), Issue is faced in user creation and possibally updation as well, have to test that theory yet.
+
+I am planning to do somehting about it, will resolve this issue as well. I am tired as of now because its 3 am in the morning. Possibally the error is because express middle kinda turns stuff into json type thing so its easier to pass on and read, but clerk requires raw transfers.
+
+I can try adding a `/api/webhooks/clerk` route before the express middleware directly in the index.ts
+
+
+Okay i have another idea, i will add the clerk webhook before any other middleware, lets test that out.

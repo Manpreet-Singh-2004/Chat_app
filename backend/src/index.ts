@@ -3,6 +3,7 @@ import 'dotenv/config'
 import {clerkMiddleware} from "@clerk/express"
 import router from "./routes/routes.js";
 import cors from "cors";
+import handleWebhook from "./controllers/webhooks/clerkWebhook.js";
 
 
 const app = express();
@@ -25,17 +26,24 @@ app.use(
   })
 );
 
+app.post(
+  "/api/webhooks/clerk",
+  express.raw({ type: "application/json" }),
+  handleWebhook
+);
+
 app.use(clerkMiddleware())
 
-app.use((req, res, next) => {
-  if (req.path === '/api/webhooks/clerk') {
-    next();
-  } else {
-    express.json()(req, res, next);
-  }
-});
+// app.use((req, res, next) => {
+//   if (req.path === '/api/webhooks/clerk') {
+//     next();
+//   } else {
+//     express.json()(req, res, next);
+//   }
+// });
 
-// app.use(express.json())
+
+app.use(express.json())
 
 
 app.use("/api",router)
