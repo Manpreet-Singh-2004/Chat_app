@@ -5,12 +5,18 @@ import {prisma} from "../../db/prisma.js"
 
 const handleWebhook = async(req: Request, res: Response) =>{
     try{
-        const evt = (await verifyWebhook(req)) as WebhookEvent;
+        const SIGNING_SECRET = process.env.CLERK_WEBHOOK_SIGNING_SECRET
+
+        if(!SIGNING_SECRET){
+            console.error("Error: CLERK_WEBHOOK_SIGNING_SECRET is missing in .env | clerkWebhooks");
+            return res.status(500).json({ error: "Missing signing secret" });
+        }
+
+        const evt = (await verifyWebhook(req, {signingSecret: SIGNING_SECRET})) as WebhookEvent;
         const {id} = evt.data
         const eventType = evt.type
-
-        console.log(`Received webhook with the ID: ${id} and the event type: ${eventType}`)
-        console.log(`Webhook payload: `, evt.data)
+        
+        console.log(`clerkWebhooks | Received webhook with the ID: ${id} and the event type: ${eventType}`)
 
         switch (eventType){
             case "user.created":
@@ -82,9 +88,10 @@ async function handleUserCreated(evt: WebhookEvent){
                 imageUrl: image_url ?? "",
             }
         });
+        console.log(`User has been created in the DB | clerkWebhooks`)
         console.log(`User created: `, JSON.stringify(user))
     } catch(error){
-        console.log(`Error while creating user: ${error}`);
+        console.log(`clerkWebhooks | Error while creating user: ${error}`);
         throw error;
     }
 
