@@ -36,3 +36,16 @@ export const fetchDMBetweenUsersAtom = atom(
         }
     }
 )
+
+export const sendMessageAtom = atom(
+    null,
+    async(_get, set, {api, chatId, content}: {api: ReturnType<typeof axios.create>; chatId: string; content: string}) => {
+        try{
+            const res = await api.post(`/api/chats/${chatId}/messages`, {content})
+            return res.data
+        } catch(error){
+            console.log(`Error sending the message | chat controller store: ${error}`)
+            throw error
+        }
+    }
+)

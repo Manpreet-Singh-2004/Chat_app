@@ -219,3 +219,6 @@ so when i was using `chatId: chatId` the state becomes
 { chatId: "123", status: "ACTIVE" }
 ```
 And my code tried to read chat.id, but this object doesnt have id, it has chatId, hence it became undefined.
+
+# Added Message sending capabilities
+Now we can send the messages, the endpoint is now at `/api/chats/:chatId/messages`. Now i will make a viewable, what messages bellong to who.

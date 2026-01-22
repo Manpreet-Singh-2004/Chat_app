@@ -7,7 +7,7 @@ import authMiddleware from '../middleware/auth.js'
 import userProfile from "../controllers/user/UserData.js";
 import getUsers from "../controllers/user/GetUsers.js";
 import getUserById from "../controllers/user/GetUserById.js";
-import {getDMBetweenUsers} from "../controllers/chat/Chat.js";
+import {getDMBetweenUsers, sendMessage} from "../controllers/chat/Chat.js";
 import {acceptDMInvite} from "../controllers/invite/AcceptDMInvite.js";
 import {declineDMInvite} from "../controllers/invite/DeclineDMInvite.js";
 import {inviteToDM} from "../controllers/invite/inviteController.js";
@@ -44,6 +44,9 @@ router.post("/chats/dm/:chatId/decline", authMiddleware.getAuthenticatedUser, de
 
 // Get Chat
 router.get("/chats/dm/:otherUserId", authMiddleware.getAuthenticatedUser, getDMBetweenUsers)
+
+// Sending Message
+router.post("/chats/:chatId/messages", authMiddleware.getAuthenticatedUser, sendMessage)
 
 // Lookup Chat by participants
 // router.post("/chats/dm/lookup", authMiddleware.getAuthenticatedUser ,getChatId)

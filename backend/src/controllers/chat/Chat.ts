@@ -37,3 +37,62 @@ export async function getDMBetweenUsers (req: Request, res: Response) {
         return res.status(500).json({error: "Internal Server Error | Chat Controller"})
     }
 }
+
+// Controller for sending a message
+
+export async function sendMessage(req: Request, res: Response){
+    const userId = (req as any).user.id
+    const {chatId} = req.params;
+    const {content} = req.body;
+
+    if(!content || !chatId){
+        console.log(`No Content or ChatId found`);
+        return res.status(404).json({success: false, message: "No content or chatId found"});
+    }
+    try{
+        const chat = await prisma.chat.findUnique({
+            where: {id: chatId},
+            include: {chatUsers: true}
+        });
+
+        if(!chat){
+            console.log(`Chat not found`)
+            return res.status(404).json({success: false, message: "Chat not found"})
+        }
+        const isParticipant = chat.chatUsers.some(member => member.userId === userId)
+
+        if(!isParticipant){
+            console.log(`You are not a Participant`)
+            return res.status(403).json({success: false, message: "You are not a particapant"})
+        }
+        if(chat.status === "DECLINED"){
+            console.log("Chat has been declined")
+            return res.status(403).json({success: false, message: "Chat has been declined"})
+        }
+
+        const message = await prisma.message.create({
+            data:{
+                content,
+                userId,
+                chatId
+            },
+            include:{ // including sender details for frontend usage
+                user:{
+                    select:{
+                        id: true,
+                        username: true,
+                        firstName: true,
+                        lastName: true,
+                        imageUrl: true
+                    }
+                }
+            }
+        });
+
+        return res.status(201).json({success: true, message:"Message sent", data: message})
+
+    } catch(error){
+        console.log(`Error while creating message: ${error}`)
+        return res.status(500).json({success: false, message: "Internal server error"})
+    }
+}
