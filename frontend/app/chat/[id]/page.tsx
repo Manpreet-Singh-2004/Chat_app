@@ -6,35 +6,27 @@ import useAuthApi from "@/app/api/Auth";
 import InviteActions from "@/components/ChatItems/InviteActions";
 import ChatMessages from "@/components/ChatItems/ChatMessages";
 import ChatHeaderSkeleton from "@/components/ChatItems/ChatHeaderSkeleton";
-import { Chat } from "@/app/types/chats";
+import ChatFooter from "@/components/ChatItems/ChatFooter";
+import { useAtom, useSetAtom } from "jotai";
+
+import { activeChatAtom, chatLoadingAtom } from "@/app/store/chats/chats.atoms";
+import { fetchDMBetweenUsersAtom } from "@/app/store/chats/chat.controller";
 
 export default function ChatPage({params} : {params: Promise<{id: string}>}){
     const {id: otherUserId} = use(params);
     const api = useAuthApi();
 
-    const [chat, setChat] = useState<Chat | null>(null)
-    const [loading, setLoading] = useState(true);
+    const [chat, setChat] = useAtom(activeChatAtom)
+    const [loading] = useAtom(chatLoadingAtom)
+
+    const fetchChat = useSetAtom(fetchDMBetweenUsersAtom)
 
     useEffect(() => {
-        async function loadChat(){
-            try{
-                const res = await api.get(`api/chats/dm/${otherUserId}`)
-                setChat(res.data)
-            } catch(error){
-                setChat({
-                  id: "placeholder", 
-                  status: "NONE",
-                  chatType: "DM",
-                  createdAt: new Date().toISOString()
-              } as Chat);
-            } finally{
-                setLoading(false);
-            }
-        }
-        if(otherUserId){
-          loadChat()
-        }
-    }, [otherUserId])
+      if(otherUserId){
+        fetchChat({api, otherUserId})
+      }
+      console.log(`Chat fetched | useEffect in Chat/[id]/page.tsx: ${fetchChat}`)
+    }, [otherUserId, fetchChat])
 
     if(loading) {
       return (
@@ -58,6 +50,8 @@ export default function ChatPage({params} : {params: Promise<{id: string}>}){
           setChat={setChat}
         />
       )}
+
+      <ChatFooter />
     </div>
   );
 }

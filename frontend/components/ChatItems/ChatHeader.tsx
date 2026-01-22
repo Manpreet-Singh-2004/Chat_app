@@ -27,7 +27,7 @@ export default function ChatHeader({ otherUserId }: ChatHeaderProps) {
   }, [otherUserId]);
 
   if (!user) {
-    console.log("Loading user for ChatHeader:", user, otherUserId);
+    // console.log("Loading user for ChatHeader:", user, otherUserId);
     return (
       <div className="h-16 flex items-center px-4 border-b">
         < ChatHeaderSkeleton />
