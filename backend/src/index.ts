@@ -6,7 +6,7 @@ import cors from "cors";
 
 
 const app = express();
-app.use(clerkMiddleware())
+
 const PORT = 3000
 
 // Global Tester Start
@@ -25,6 +25,15 @@ app.use(
   })
 );
 
+app.use(clerkMiddleware())
+
+app.use((req, res, next) => {
+  if (req.path === '/api/webhooks/clerk') {
+    next();
+  } else {
+    express.json()(req, res, next);
+  }
+});
 
 // app.use(express.json())
 
