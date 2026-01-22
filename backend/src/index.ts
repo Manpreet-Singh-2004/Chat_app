@@ -6,7 +6,15 @@ import cors from "cors";
 
 
 const app = express();
+app.use(clerkMiddleware())
 const PORT = 3000
+
+// Global Tester Start
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] Incoming Request: ${req.method} ${req.originalUrl}`);
+  next();
+});
+// Global tester end
 
 app.use(
   cors({
@@ -17,8 +25,8 @@ app.use(
   })
 );
 
-app.use(clerkMiddleware())
-app.use(express.json())
+
+// app.use(express.json())
 
 
 app.use("/api",router)
