@@ -1,3 +1,5 @@
+import {User} from "./user"
+
 export type ChatStatus = "INVITED" | "ACTIVE" | "DECLINED" | "NONE";
 export type ChatType = "DM" | "GROUP";
 
@@ -19,4 +21,19 @@ export interface Chat {
   // Optional: If your API returns relations, you can add them here later
   // messages?: Message[];
   // chatUsers?: ChatUser[];
+}
+
+export interface Message{
+  id: string;
+    content: string;
+    createdAt: string; // serialized Date
+    userId: string;
+    chatId: string;
+    user: {
+        id: string;
+        firstName: string;
+        lastName: string;
+        username: string;
+        imageUrl: string;
+    }
 }

@@ -1,7 +1,8 @@
 import axios from "axios";
 import { atom } from "jotai";
-import { activeChatAtom, chatLoadingAtom, chatErrorAtom } from './chats.atoms';
-import { Chat } from "@/app/types/chats";
+import { activeChatAtom, chatLoadingAtom, chatErrorAtom, chatMessagesAtom, messagesLoadingAtom } from './chats.atoms';
+import { Chat, Message } from "@/app/types/chats";
+import {currentUserAtom} from "../users/users.atoms"
 
 export const fetchDMBetweenUsersAtom = atom(
     null,
@@ -39,13 +40,62 @@ export const fetchDMBetweenUsersAtom = atom(
 
 export const sendMessageAtom = atom(
     null,
-    async(_get, set, {api, chatId, content}: {api: ReturnType<typeof axios.create>; chatId: string; content: string}) => {
+    async(get, set, {api, chatId, content}: {api: ReturnType<typeof axios.create>; chatId: string; content: string}) => {
+
+        const currentUser = get(currentUserAtom)
+        if(!currentUser){
+            console.log("Cannot send message: User is not logged in")
+            return
+        }
+
+        const tempId = Math.random().toString(36).substring(7);
+        const optimisticMessage: Message = {
+            id: tempId,
+            content,
+            chatId,
+            userId: currentUser.id,
+            createdAt: new Date().toISOString(),
+            user:{
+                id: currentUser.id,
+                firstName: currentUser.firstName,
+                lastName: currentUser.lastName,
+                username: currentUser.username || "",
+                imageUrl: currentUser.imageUrl
+            }
+        };
+
+        const currentMessages = get(chatMessagesAtom);
+        set(chatMessagesAtom, [...currentMessages, optimisticMessage])
+
         try{
-            const res = await api.post(`/api/chats/${chatId}/messages`, {content})
+            const res = await api.post(`/api/chats/${chatId}/messages`, {content});
+            if(res.data.success){
+                const realMessage = res.data.data;
+                set(chatMessagesAtom, (prev) => prev.map(m => m.id === tempId ? realMessage : m));
+            }
             return res.data
         } catch(error){
             console.log(`Error sending the message | chat controller store: ${error}`)
             throw error
+        }
+    }
+)
+
+export const fetchMessageAtom = atom(
+    null,
+    async (get, set, {api, chatId}: {api: ReturnType<typeof axios.create>; chatId: string}) => {
+        set(messagesLoadingAtom, true);
+        try{
+            const response = await api.get(`/api/chats/${chatId}/messages`);
+            if(response.data.success){
+                set(chatMessagesAtom, response.data.data)
+            }
+        } catch(error){
+            console.log("Error loading the messages | fetchMessageAtom")
+            set(chatMessagesAtom, [])
+            throw error
+        } finally{
+            set(messagesLoadingAtom, false)
         }
     }
 )
