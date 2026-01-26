@@ -10,7 +10,7 @@ export default function ChatMessages({ id }: { id: string }) {
 
   const api = useAuthApi()
   const [messages] = useAtom(chatMessagesAtom);
-  const{isLoading} = useAtom(messagesLoadingAtom)
+  const[isLoading] = useAtom(messagesLoadingAtom)
   const currentUser = useAtomValue(currentUserAtom);
   const fetchMessages = useSetAtom(fetchMessageAtom);
 
