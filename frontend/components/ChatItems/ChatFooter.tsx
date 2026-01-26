@@ -48,10 +48,10 @@ export default function ChatFooter() {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          disabled={!activeChat?.id || activeChat.status === "DECLINED"}
+          disabled={!activeChat?.id || activeChat.status === "DECLINED" || activeChat.status === "INVITED"}
         />
 
-        <Button size="icon" onClick={handleSend} disabled={!message.trim() || !activeChat?.id}>
+        <Button size="icon" onClick={handleSend} disabled={!message.trim() || !activeChat?.id || activeChat.status === "INVITED"}>
           <Send />
         </Button>
       </div>

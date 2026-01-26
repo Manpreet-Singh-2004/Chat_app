@@ -1,8 +1,10 @@
 "use client"
 
 import useAuthApi from "@/app/api/Auth"
-import { useAuth } from "@clerk/nextjs"
 import { Chat } from "@/app/types/chats"
+import { Button } from "../ui/button"
+import { currentUserAtom } from "@/app/store/users/users.atoms"
+import { useAtomValue } from "jotai"
 
 interface Props{
     chat: Chat;
@@ -16,9 +18,9 @@ export default function InviteActions({
     setChat,
 }: Props){
     const api = useAuthApi();
-    const {userId} = useAuth();
+    const currentUser = useAtomValue(currentUserAtom);
 
-    const isInviter = chat.invitedByUserId === userId;
+    const isInviter = chat.invitedByUserId === currentUser?.id;
 
     async function invite(){
         const res = await api.post("/api/chats/invite", {otherUserId});
@@ -36,9 +38,9 @@ export default function InviteActions({
     if(chat.status === "NONE"){
         return (
             <div className="p-4">
-                <button className="btn-primary" onClick={invite}>
+                <Button className="btn-primary" onClick={invite}>
                 Start Chat
-                </button>
+                </Button>
             </div>
         );
     }
@@ -46,19 +48,19 @@ export default function InviteActions({
     if(chat.status === "INVITED"){
         if(isInviter){
             return (
-                <div className="p-4 text-slate-400">
+                <div className="p-4 text-slate-400 self-center">
                 Invite sent
                 </div>
             );
         }
         return(
-            <div className="flex gap-3 p-4">
-                <button className="btn-primary" onClick={accept}>
+            <div className="flex gap-3 p-4 center self-center">
+                <Button className="btn-primary" onClick={accept}>
                     Accept
-                </button>
-                <button className="btn-danger" onClick={decline}>
+                </Button>
+                <Button className="btn-danger" onClick={decline}>
                     Decline
-                </button>
+                </Button>
             </div>
         )
     }
@@ -66,15 +68,15 @@ export default function InviteActions({
     if(chat.status === "DECLINED"){
         if(isInviter){
             return (
-                <div className="p-4">
-                <button className="btn-primary" onClick={invite}>
+                <div className="p-4 self-center">
+                <Button className="btn-primary" onClick={invite}>
                     Re-invite
-                </button>
+                </Button>
                 </div>
             );
         }
         return (
-            <div className="p-4 text-slate-400">
+            <div className="p-4 text-slate-400 self-center">
                 You declined this invite
             </div>
         );

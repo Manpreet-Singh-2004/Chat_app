@@ -52,5 +52,5 @@ export async function acceptDMInvite(req: Request, res: Response){
         }),
     ]);
 
-    return res.status(200).json({success: true, chatId, status: "ACTIVE", message: "DM invite accepted"})
+    return res.status(200).json({success: true, id: chatId, status: "ACTIVE", message: "DM invite accepted"})
 }

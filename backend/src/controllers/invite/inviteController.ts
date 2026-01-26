@@ -63,8 +63,9 @@ export async function inviteToDM(req: Request, res: Response){
 
             return res.status(201).json({
                 success: true,
-                chatId: chat.id,
+                id: chat.id,
                 status: chat.status,
+                invitedByUserId: userId,
                 message: "Invite Sent"
             })
         }
@@ -156,7 +157,8 @@ export async function inviteToDM(req: Request, res: Response){
 
             return res.status(200).json({
                 success: true,
-                chatId: chat.id,
+                id: chat.id,
+                invitedByUserId: userId,
                 status: chat.status,
                 message: "Invite Re-Sent"
             });

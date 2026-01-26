@@ -53,7 +53,7 @@ export async function declineDMInvite(req: Request, res: Response){
             })
         ]);
 
-        return res.status(200).json({success: true, chatId, status: "DECLINED", message: "DM invite declined"});
+        return res.status(200).json({success: true, id: chatId, status: "DECLINED", message: "DM invite declined"});
 
     } catch(error){
         console.error("Decline DM Invite Controller | Error declining DM invite:", error);

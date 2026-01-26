@@ -278,3 +278,6 @@ looks like it got disabled god damn it. After enabling it, i wiped the DB with t
 
 # Heads up for future
 when deleting user, it might be deleted from clerk, but it **might** not get deleted from DB because that user id exists as foreign keys for other chats and messages, If that is the case i have to delete the chats and messages first and then delete the user.
+
+# Bug for Accedt and decline 25-01-2026
+I found a bug that when the invite is sent both the inviter and invitee see the accept and decline buttons, which should not be case. The issue was resolved by adding a new `currentUserAtom` in user Atoms, I also had to make sure that in the inviteController the return shape is now `id: chat.id` and also added `invitedByUserId` This is added when Status is **Declined** or when status is **Invited**, Then in I am calling that currentUserAtom in the Navbar component, so that the current user is loaded as soon as possible, while rendering the navbar.
