@@ -4,24 +4,72 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { chatMessagesAtom, messagesLoadingAtom } from "@/app/store/chats/chats.atoms";
 import { fetchMessageAtom } from "@/app/store/chats/chat.controller";
 import { currentUserAtom } from "@/app/store/users/users.atoms";
-import useAuthApi from "@/app/api/Auth"; 
+import useAuthApi from "@/app/api/Auth";
+// [NEW] Imports for Socket logic
+import { useAuth } from "@clerk/nextjs";
+import { socket } from "@/lib/socket";
+import { Message } from "@/app/types/chats"; // Ensure you have this type imported
 
 export default function ChatMessages({ id }: { id: string }) {
 
   const api = useAuthApi()
-  const [messages] = useAtom(chatMessagesAtom);
-  const[isLoading] = useAtom(messagesLoadingAtom)
+  // [CHANGED] We need 'setMessages' to update state when socket events arrive
+  const [messages, setMessages] = useAtom(chatMessagesAtom);
+  const [isLoading] = useAtom(messagesLoadingAtom)
   const currentUser = useAtomValue(currentUserAtom);
   const fetchMessages = useSetAtom(fetchMessageAtom);
+  
+  // [NEW] Get getToken to authenticate the socket connection
+  const { getToken } = useAuth();
 
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  // Fetch messages on mount or when chatId changes
+  // Fetch messages on mount or when chatId changes (API Fetch)
   useEffect(() => {
     if(id){
       fetchMessages({api, chatId: id})
     }
-  }, [fetchMessages])
+  }, [id, fetchMessages, api]) // Added missing dependencies
+
+  // [NEW] Socket.io Connection & Event Listeners
+  useEffect(() => {
+    // 1. Define the connection logic
+    const connectSocket = async () => {
+        const token = await getToken();
+        if (token) {
+            // Attach token for the backend middleware to verify
+            socket.auth = { token };
+            socket.connect();
+            
+            // Join the specific chat room
+            socket.emit("join_chat", id);
+        }
+    };
+
+    connectSocket();
+
+    // 2. Define the listener for incoming messages
+    const handleReceiveMessage = (newMessage: Message) => {
+        setMessages((prev) => {
+            // Deduplication: Check if we already have this message ID
+            // (Prevents duplicates from optimistic updates or double-fires)
+            if (prev.some((m) => m.id === newMessage.id)) {
+                return prev;
+            }
+            return [...prev, newMessage];
+        });
+    };
+
+    // 3. Subscribe to the event
+    socket.on("receive_message", handleReceiveMessage);
+
+    // 4. Cleanup on unmount or chat change
+    return () => {
+        socket.off("receive_message", handleReceiveMessage);
+        socket.disconnect();
+    };
+  }, [id, getToken, setMessages]);
+
 
   // Scrolling to the bottom
   useEffect(() =>{
@@ -39,7 +87,7 @@ export default function ChatMessages({ id }: { id: string }) {
   }
 
   return (
-<div className="flex-1 p-4 overflow-y-auto space-y-4">
+    <div className="flex-1 p-4 overflow-y-auto space-y-4">
       {messages.length === 0 ? (
         <div className="flex h-full items-center justify-center text-muted-foreground">
           <p>No messages yet. Say hello! 👋</p>
@@ -62,7 +110,7 @@ export default function ChatMessages({ id }: { id: string }) {
               >
                 {!isMe && (
                     <p className="text-xs text-muted-foreground mb-1 font-semibold">
-                        {msg.user.firstName}
+                        {msg.user?.firstName}
                     </p>
                 )}
                 <p className="text-sm">{msg.content}</p>

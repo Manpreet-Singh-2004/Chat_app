@@ -1,5 +1,6 @@
 import type {Request, Response} from "express"
 import {prisma} from "../../db/prisma.js"
+import { Server } from "socket.io";
 
 export async function sendMessage(req: Request, res: Response){
     const userId = (req as any).user.id
@@ -49,6 +50,15 @@ export async function sendMessage(req: Request, res: Response){
                 }
             }
         });
+
+        const io = req.app.get("io") as Server;
+
+        if(io){
+            io.to(chatId).emit("recieved_message", message);
+            console.log(`Socket emitted message to room ${chatId}`)
+        } else{
+            console.log(`Socket io instance not found in the app`)
+        }
 
         return res.status(201).json({success: true, message:"Message sent", data: message})
 

@@ -29,7 +29,7 @@ export async function getDMBetweenUsers (req: Request, res: Response) {
             return res.status(404).json({success: false, message: "No Chat was found. Please send an invite"});
         }
 
-        console.log("Chat found between users:", chat);
+        
         return res.status(200).json({success: true, id: chat.id, status: chat.status, invitedByUserId: chat.invitedByUserId, message: "Chat found"});
 
     } catch(error){

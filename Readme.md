@@ -281,3 +281,34 @@ when deleting user, it might be deleted from clerk, but it **might** not get del
 
 # Bug for Accedt and decline 25-01-2026
 I found a bug that when the invite is sent both the inviter and invitee see the accept and decline buttons, which should not be case. The issue was resolved by adding a new `currentUserAtom` in user Atoms, I also had to make sure that in the inviteController the return shape is now `id: chat.id` and also added `invitedByUserId` This is added when Status is **Declined** or when status is **Invited**, Then in I am calling that currentUserAtom in the Navbar component, so that the current user is loaded as soon as possible, while rendering the navbar.
+
+# Adding websockets 27-01-2026
+Now the messages are working, what i now want is to display the messages continously. This is where i will be using websockets, Firstly i made a websocket server and we will be listening to that server instead of app server.
+In the index.ts
+
+```ts
+const httpServer = createServer(app)
+
+httpServer.listen(PORT, () => {
+  console.log(`Backend running on http://localhost:${PORT}`);
+});
+```
+
+Then in the Messages controller, i am emmiting the messages
+
+```ts
+    const io = req.app.get("io") as Server;
+
+    if(io){
+        io.to(chatId).emit("recieved_message", message);
+        console.log(`Socket emitted message to room ${chatId}`)
+    } else{
+        console.log(`Socket io instance not found in the app`)
+    }
+```
+
+## Issue for improper handshake in websocket
+
+Before i wasn't using useMemo in the `api/Auth.ts`, not that i am using it, it provides a safety net so that API dosnt have to create a new instance on every render. the useMemo just uses the already existing instance.
+
+This has caused websocket to stop working, why? no idea, but when i am not using useMemo, then new instances keep on getting created.
