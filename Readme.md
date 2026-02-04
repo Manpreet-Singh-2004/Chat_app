@@ -329,3 +329,6 @@ In this try block in `store/chats/chat.controller.ts`
             }
             return res.data
 ```
+
+# Hosting Paid
+Railway is charging money for deployment (my free trial is over), the services may be down and the frontend may show `Network Error` because the backend is down. I will enable the backend if i have to showcase the project to someone, till then, it will remain down.
