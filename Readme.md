@@ -312,3 +312,20 @@ Then in the Messages controller, i am emmiting the messages
 Before i wasn't using useMemo in the `api/Auth.ts`, not that i am using it, it provides a safety net so that API dosnt have to create a new instance on every render. the useMemo just uses the already existing instance.
 
 This has caused websocket to stop working, why? no idea, but when i am not using useMemo, then new instances keep on getting created.
+
+## Fixed proper handshake in websocket
+There was a typo in the backend. The frontend was expecting `recieve_message` and the backend was sending `recieved_message` there was an extra d there. The useMemo approach was correct because now the app will only create 1 instance of it and reffer back to it.
+
+## Race conditions with optimistic UI (showing message)
+Now that Socket is working, i am getting a clash with sending a message. get this, before i was giving a temp Id to a message so it can be seen by the user immediately but now that socket is working and it is way faster, it is having clash with that tempId i gave to the message earlier. because i was giving it a tempid and when it goes to DB then its tempId gets written by realId.
+
+In this try block in `store/chats/chat.controller.ts`
+```ts
+        try{
+            const res = await api.post(`/api/chats/${chatId}/messages`, {content});
+            if(res.data.success){
+                const realMessage = res.data.data;
+                set(chatMessagesAtom, (prev) => prev.map(m => m.id === tempId ? realMessage : m));
+            }
+            return res.data
+```

@@ -29,14 +29,14 @@ export default function ChatHeader({ otherUserId }: ChatHeaderProps) {
   if (!user) {
     // console.log("Loading user for ChatHeader:", user, otherUserId);
     return (
-      <div className="h-16 flex items-center px-4 border-b">
+      <div className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-4 border-b bg-white dark:bg-slate-900">
         < ChatHeaderSkeleton />
       </div>
     );
   }
 
   return (
-    <div className="h-16 flex items-center gap-3 px-4 border-b bg-white dark:bg-slate-900">
+    <div className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center gap-3 px-4 border-b bg-white dark:bg-slate-900">
       {user.imageUrl ? (
         <Image
           src={user.imageUrl}

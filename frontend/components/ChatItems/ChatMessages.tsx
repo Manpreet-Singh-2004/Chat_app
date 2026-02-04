@@ -19,7 +19,6 @@ export default function ChatMessages({ id }: { id: string }) {
   const currentUser = useAtomValue(currentUserAtom);
   const fetchMessages = useSetAtom(fetchMessageAtom);
   
-  // [NEW] Get getToken to authenticate the socket connection
   const { getToken } = useAuth();
 
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -33,7 +32,21 @@ export default function ChatMessages({ id }: { id: string }) {
 
   // [NEW] Socket.io Connection & Event Listeners
   useEffect(() => {
-    // 1. Define the connection logic
+
+    if(!id) return
+
+    // Define the listener for incoming messages
+    const handleReceiveMessage = (newMessage: Message) => {
+        setMessages((prev) => {
+            // Deduplication: Check if we already have this message ID
+            if (prev.some((m) => m.id === newMessage.id)) {
+                return prev;
+            }
+            return [...prev, newMessage];
+        });
+    };
+
+    // Define the connection logic
     const connectSocket = async () => {
         const token = await getToken();
         if (token) {
@@ -43,25 +56,11 @@ export default function ChatMessages({ id }: { id: string }) {
             
             // Join the specific chat room
             socket.emit("join_chat", id);
+            socket.on("recieve_message", handleReceiveMessage)
         }
     };
 
     connectSocket();
-
-    // 2. Define the listener for incoming messages
-    const handleReceiveMessage = (newMessage: Message) => {
-        setMessages((prev) => {
-            // Deduplication: Check if we already have this message ID
-            // (Prevents duplicates from optimistic updates or double-fires)
-            if (prev.some((m) => m.id === newMessage.id)) {
-                return prev;
-            }
-            return [...prev, newMessage];
-        });
-    };
-
-    // 3. Subscribe to the event
-    socket.on("receive_message", handleReceiveMessage);
 
     // 4. Cleanup on unmount or chat change
     return () => {

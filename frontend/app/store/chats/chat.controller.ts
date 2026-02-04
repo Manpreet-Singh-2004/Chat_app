@@ -71,7 +71,13 @@ export const sendMessageAtom = atom(
             const res = await api.post(`/api/chats/${chatId}/messages`, {content});
             if(res.data.success){
                 const realMessage = res.data.data;
-                set(chatMessagesAtom, (prev) => prev.map(m => m.id === tempId ? realMessage : m));
+                set(chatMessagesAtom, (prev) =>{
+                    const alreadyExist = prev.some(m => m.id === realMessage.id);
+                    if(alreadyExist){
+                        return prev.filter(m => m.id !== tempId)
+                    }
+                    return prev.map(m=> m.id === tempId ? realMessage:m)
+                })
             }
             return res.data
         } catch(error){

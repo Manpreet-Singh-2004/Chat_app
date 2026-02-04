@@ -54,7 +54,7 @@ export async function sendMessage(req: Request, res: Response){
         const io = req.app.get("io") as Server;
 
         if(io){
-            io.to(chatId).emit("recieved_message", message);
+            io.to(chatId).emit("recieve_message", message);
             console.log(`Socket emitted message to room ${chatId}`)
         } else{
             console.log(`Socket io instance not found in the app`)
